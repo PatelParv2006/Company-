@@ -121,7 +121,9 @@ export default async function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className={`${manrope.variable} ${spaceGrotesk.variable} min-h-full flex flex-col font-sans transition-colors duration-300 bg-white text-gray-900 dark:bg-[#030712] dark:text-gray-50`}>
+      <body
+        className={`${manrope.variable} ${spaceGrotesk.variable} min-h-full flex flex-col font-sans transition-colors duration-300 bg-[var(--bg-primary)] text-[var(--text-primary)]`}
+      >
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <Navbar />
           <main className="flex-1">{children}</main>

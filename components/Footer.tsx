@@ -74,7 +74,6 @@ export default function Footer({ settings }: FooterProps) {
       links: [
         { href: "/services", label: "Services" },
         { href: "/estimator", label: "Estimator" },
-        { href: "/ai-assistant", label: "AI Assistant" },
         { href: "/contact", label: "Contact" },
       ],
     },

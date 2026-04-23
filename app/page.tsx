@@ -4,6 +4,8 @@ import { ArrowRight, BrainCircuit, CheckCircle2, Clock3, Code2, LineChart, Messa
 import AnimatedCounter from "@/components/AnimatedCounter";
 import ParticleGrid from "@/components/ParticleGrid";
 import TechMarquee from "@/components/TechMarquee";
+import FaqAccordion from "@/components/FaqAccordion";
+import FaqOrbScene from "@/components/FaqOrbScene";
 import { getBlogPosts, getFeaturedProjects, getSiteSettings, getSiteUrl } from "@/lib/site-content";
 
 export async function generateMetadata() {
@@ -47,7 +49,7 @@ export default async function Home() {
   const latestPosts = posts.slice(0, 3);
 
   return (
-    <div className="overflow-hidden bg-[#0a0a0f] text-white">
+    <div className="adaptive-theme overflow-hidden bg-[var(--bg-primary)] text-[var(--text-primary)]">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -286,10 +288,11 @@ export default async function Home() {
             <p className="mt-4 max-w-xl text-lg leading-8 text-slate-300">
               If you&apos;re still comparing options or refining scope, these answers should help you move forward with more confidence.
             </p>
+            <FaqOrbScene />
           </div>
 
-          <div className="space-y-4">
-            {[
+          <FaqAccordion
+            items={[
               {
                 question: "How much does a SaaS project cost?",
                 answer:
@@ -320,18 +323,8 @@ export default async function Home() {
                 answer:
                   "We can support ongoing iteration, performance tuning, analytics review, and roadmap delivery through structured support plans.",
               },
-            ].map((item) => (
-              <details
-                key={item.question}
-                className="group rounded-[1.5rem] border border-white/10 bg-white/5 p-6 backdrop-blur-xl"
-              >
-                <summary className="cursor-pointer list-none font-heading text-xl font-bold text-white">
-                  {item.question}
-                </summary>
-                <p className="mt-4 text-sm leading-7 text-slate-300">{item.answer}</p>
-              </details>
-            ))}
-          </div>
+            ]}
+          />
         </div>
       </section>
 
@@ -402,10 +395,10 @@ export default async function Home() {
             Contact Us
           </Link>
           <Link
-            href="/ai-assistant"
+            href="/estimator"
             className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-7 py-4 font-semibold text-slate-100 transition hover:bg-white/10"
           >
-            Ask the AI Assistant
+            Use Estimator
           </Link>
         </div>
       </section>

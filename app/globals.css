@@ -1,6 +1,36 @@
 @import "tailwindcss";
 @custom-variant dark (&:is(.dark *));
 
+:root {
+  --bg-primary: #f8f8ff;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #eeeef8;
+  --accent-blue: #2563eb;
+  --accent-violet: #7c3aed;
+  --accent-cyan: #0891b2;
+  --text-primary: #0a0a1a;
+  --text-secondary: #3a3a5c;
+  --text-muted: #8080a0;
+  --border: #00000012;
+  --glow-blue: 0 0 32px #2563eb33;
+  --glow-violet: 0 0 32px #7c3aed33;
+}
+
+.dark {
+  --bg-primary: #080810;
+  --bg-secondary: #0f0f1a;
+  --bg-tertiary: #16162a;
+  --accent-blue: #4f8ef7;
+  --accent-violet: #9b6dff;
+  --accent-cyan: #22d3ee;
+  --text-primary: #f0f0ff;
+  --text-secondary: #a0a0c0;
+  --text-muted: #606080;
+  --border: #ffffff14;
+  --glow-blue: 0 0 40px #4f8ef740;
+  --glow-violet: 0 0 40px #9b6dff40;
+}
+
 @theme {
   --font-sans: "Manrope", "Segoe UI", sans-serif;
   --font-heading: "Space Grotesk", "Avenir Next", "Segoe UI", sans-serif;
@@ -26,7 +56,14 @@
   }
 
   body {
-    background: #0a0a0f;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    text-rendering: optimizeLegibility;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent-blue);
+    outline-offset: 2px;
   }
 
   *,
@@ -64,15 +101,15 @@ h1, h2, h3, h4, h5, h6, p, span, label {
 }
 
 .glass-nav {
-  background: rgba(255, 255, 255, 0.65);
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background: color-mix(in oklab, var(--bg-secondary) 42%, transparent);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 8px 22px rgba(11, 20, 45, 0.06);
 }
 
 .dark .glass-nav {
-  background: rgba(10, 10, 15, 0.65);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 12px 28px rgba(3, 8, 25, 0.24);
 }
 
 /* ═══════════════════════════════════════════
@@ -255,6 +292,52 @@ h1, h2, h3, h4, h5, h6, p, span, label {
    Selection styling
    ═══════════════════════════════════════════ */
 ::selection {
-  background: rgba(59, 130, 246, 0.3);
-  color: inherit;
+  background: color-mix(in oklab, var(--accent-violet) 45%, transparent);
+  color: var(--text-primary);
+}
+
+.theme-surface {
+  border: 1px solid var(--border);
+  background: color-mix(in oklab, var(--bg-secondary) 78%, transparent);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.theme-section-alt {
+  background: var(--bg-tertiary);
+}
+
+/* Light-mode adaptation for legacy dark utility classes */
+.light .adaptive-theme .text-white {
+  color: var(--text-primary) !important;
+}
+
+.light .adaptive-theme .text-slate-100,
+.light .adaptive-theme .text-slate-200,
+.light .adaptive-theme .text-slate-300 {
+  color: var(--text-secondary) !important;
+}
+
+.light .adaptive-theme .text-slate-400,
+.light .adaptive-theme .text-slate-500 {
+  color: var(--text-muted) !important;
+}
+
+.light .adaptive-theme .border-white\/10,
+.light .adaptive-theme .border-white\/15,
+.light .adaptive-theme .border-white\/5 {
+  border-color: var(--border) !important;
+}
+
+.light .adaptive-theme .bg-white\/5 {
+  background: color-mix(in oklab, var(--bg-secondary) 72%, transparent) !important;
+}
+
+.light .adaptive-theme .bg-white\/10 {
+  background: color-mix(in oklab, var(--bg-secondary) 82%, transparent) !important;
+}
+
+.light .adaptive-theme .btn-glow,
+.light .adaptive-theme .btn-glow * {
+  color: #fff !important;
 }

@@ -25,7 +25,7 @@ export default function ProjectsExplorer({ projects }: ProjectsExplorerProps) {
   }, [activeCategory, projects]);
 
   return (
-    <div>
+    <div className="adaptive-theme">
       <div className="mb-10 flex flex-wrap gap-3">
         {categories.map((category) => {
           const active = category === activeCategory;

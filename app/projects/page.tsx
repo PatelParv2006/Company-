@@ -19,7 +19,7 @@ export default async function ProjectsPage() {
   const projects = await getProjects();
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] pt-28 text-white">
+    <div className="adaptive-theme min-h-screen bg-[var(--bg-primary)] pt-28 text-[var(--text-primary)]">
       <div className="mx-auto max-w-7xl px-4 pb-24 sm:px-6 lg:px-8">
         <div className="max-w-3xl">
           <p className="text-sm font-semibold uppercase tracking-[0.28em] text-blue-300">Selected Work</p>

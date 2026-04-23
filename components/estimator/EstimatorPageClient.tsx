@@ -421,7 +421,7 @@ export default function EstimatorPageClient({
   );
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] pt-28 text-white">
+    <div className="adaptive-theme min-h-screen bg-[var(--bg-primary)] pt-28 text-[var(--text-primary)]">
       <div className="mx-auto max-w-7xl px-4 pb-36 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-3xl">

@@ -20,18 +20,22 @@ export default function AnimatedCounter({
 }: AnimatedCounterProps) {
   const [count, setCount] = useState(0);
   const ref = useRef<HTMLSpanElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const isInView = useInView(ref, {
+    once: true,
+    // Framer Motion expects a CSS-like rootMargin string: "top right bottom left"
+    margin: "0px 0px -120px 0px",
+  });
   const hasAnimated = useRef(false);
 
   useEffect(() => {
     if (!isInView || hasAnimated.current) return;
     hasAnimated.current = true;
 
-    let startTime: number;
+    let startTime: number | null = null;
     let animFrame: number;
 
     const animate = (timestamp: number) => {
-      if (!startTime) startTime = timestamp;
+      if (startTime == null) startTime = timestamp;
       const progress = Math.min((timestamp - startTime) / duration, 1);
       // Ease out cubic
       const eased = 1 - Math.pow(1 - progress, 3);

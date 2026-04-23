@@ -35,7 +35,6 @@ export default function Navbar() {
     { name: "Services", href: "/services" },
     { name: "About", href: "/about" },
     { name: "Estimator", href: "/estimator" },
-    { name: "AI Assistant", href: "/ai-assistant" },
     { name: "Contact", href: "/contact" },
   ];
 
@@ -43,7 +42,7 @@ export default function Navbar() {
     <nav
       className={`sticky top-0 z-40 w-full transition-all duration-500 ${
         scrolled
-          ? "glass-nav shadow-lg shadow-black/5"
+          ? "glass-nav"
           : "bg-transparent border-b border-transparent"
       }`}
     >
@@ -54,7 +53,7 @@ export default function Navbar() {
             <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-violet-600 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20">
               <span className="text-white font-bold text-sm">D</span>
             </div>
-            <Link href="/" className="font-heading font-bold text-xl text-gray-900 dark:text-white">
+            <Link href="/" className="font-heading font-bold text-xl text-[var(--text-primary)]">
               DevMind <span className="text-blue-500">Studio</span>
             </Link>
           </div>
@@ -69,8 +68,8 @@ export default function Navbar() {
                   href={link.href}
                   className={`px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
                     isActive
-                      ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10"
-                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5"
+                      ? "text-[var(--accent-blue)] bg-[color:color-mix(in_oklab,var(--accent-blue)_12%,transparent)]"
+                      : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[color:color-mix(in_oklab,var(--bg-tertiary)_65%,transparent)]"
                   }`}
                 >
                   {link.name}
@@ -84,13 +83,13 @@ export default function Navbar() {
             {mounted && (
               <button
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
+                className="p-2 rounded-lg hover:bg-[color:color-mix(in_oklab,var(--bg-tertiary)_70%,transparent)] transition-colors"
                 aria-label="Toggle theme"
               >
                 {theme === "dark" ? (
-                  <Sun className="w-5 h-5 text-gray-400 hover:text-yellow-400 transition-colors" />
+                  <Sun className="w-5 h-5 text-[var(--text-secondary)] hover:text-yellow-400 transition-colors" />
                 ) : (
-                  <Moon className="w-5 h-5 text-gray-600 hover:text-gray-900 transition-colors" />
+                  <Moon className="w-5 h-5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors" />
                 )}
               </button>
             )}
@@ -107,19 +106,19 @@ export default function Navbar() {
             {mounted && (
               <button
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5"
+                className="p-2 rounded-lg hover:bg-[color:color-mix(in_oklab,var(--bg-tertiary)_70%,transparent)]"
                 aria-label="Toggle theme"
               >
                 {theme === "dark" ? (
-                  <Sun className="w-5 h-5 text-gray-400" />
+                  <Sun className="w-5 h-5 text-[var(--text-secondary)]" />
                 ) : (
-                  <Moon className="w-5 h-5 text-gray-600" />
+                  <Moon className="w-5 h-5 text-[var(--text-secondary)]" />
                 )}
               </button>
             )}
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5"
+              className="p-2 rounded-lg text-[var(--text-secondary)] hover:bg-[color:color-mix(in_oklab,var(--bg-tertiary)_70%,transparent)]"
             >
               {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -146,8 +145,8 @@ export default function Navbar() {
                     href={link.href}
                     className={`block px-4 py-2.5 rounded-lg text-base font-medium transition-colors ${
                       isActive
-                        ? "bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400"
-                        : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5"
+                        ? "text-[var(--accent-blue)] bg-[color:color-mix(in_oklab,var(--accent-blue)_10%,transparent)]"
+                        : "text-[var(--text-secondary)] hover:bg-[color:color-mix(in_oklab,var(--bg-tertiary)_65%,transparent)]"
                     }`}
                   >
                     {link.name}
