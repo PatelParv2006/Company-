@@ -41,10 +41,10 @@ export default function Navbar() {
 
   return (
     <nav
-      className={`sticky top-0 z-40 w-full transition-all duration-300 ${
+      className={`sticky top-0 z-40 w-full transition-all duration-500 ${
         scrolled
-          ? "glass-nav-light dark:glass-nav border-b border-gray-200/50 dark:border-white/[0.06] shadow-sm"
-          : "bg-white/0 dark:bg-transparent border-b border-transparent"
+          ? "glass-nav shadow-lg shadow-black/5"
+          : "bg-transparent border-b border-transparent"
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -135,7 +135,7 @@ export default function Navbar() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="lg:hidden overflow-hidden glass-nav-light dark:glass-nav border-t border-gray-200/50 dark:border-white/[0.06]"
+            className="lg:hidden overflow-hidden glass-nav shadow-2xl"
           >
             <div className="px-4 pt-3 pb-4 space-y-1">
               {navLinks.map((link) => {

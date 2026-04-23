@@ -1,72 +1,99 @@
-import { createOpenAI } from "@ai-sdk/openai";
-import { streamText } from "ai";
-import { supabase, isSupabaseConfigured } from "@/lib/supabase";
+import { NextResponse } from "next/server";
+import { createServerSupabaseClient } from "@/lib/supabase";
+import { generateAssistantReply, type StoredChatMessage } from "@/lib/chat";
 
-// Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
 
-// Create Groq provider using the OpenAI compatible protocol
-const groq = createOpenAI({
-  baseURL: "https://api.groq.com/openai/v1",
-  apiKey: process.env.GROQ_API_KEY,
-});
-
-export async function POST(req: Request) {
-  const { messages, sessionId } = await req.json();
-
-  const systemPrompt = `You are a helpful, professional, and concise AI assistant for DevMind Studio, a premium software development agency. 
-Your goal is to answer questions about the agency's services (Web Apps, SaaS, Mobile Apps, UI/UX), pricing (usually starting around ₹15,000 for simple sites to ₹1,50,000+ for SaaS), and project timelines. 
-Keep your answers brief and focused. If you don't know the answer, recommend using the contact form to speak with a human engineer.`;
-
-  // Check if API key is configured
-  if (!process.env.GROQ_API_KEY || process.env.GROQ_API_KEY === "your_groq_api_key_here") {
-    return Response.json(
-      { error: "Groq API key not configured. Please add your GROQ_API_KEY to .env.local" },
-      { status: 500 }
-    );
+async function getChatRecord(sessionId: string) {
+  const supabase = createServerSupabaseClient();
+  if (!supabase) {
+    return null;
   }
 
-  try {
-    const result = await streamText({
-      model: groq("llama-3.3-70b-versatile") as any,
-      system: systemPrompt,
-      messages,
-      maxRetries: 0,
-      async onFinish({ text }) {
-        if (sessionId && isSupabaseConfigured()) {
-          // Save session asynchronously
-          const allMessages = [...messages, { role: 'assistant', content: text }];
-          
-          // Check if session exists
-          const { data } = await supabase
-            .from('chat_sessions')
-            .select('id')
-            .eq('session_id', sessionId)
-            .single();
-            
-          if (data) {
-            // Update
-            await supabase
-              .from('chat_sessions')
-              .update({ messages: allMessages, updated_at: new Date().toISOString() })
-              .eq('session_id', sessionId);
-          } else {
-            // Insert
-            await supabase
-              .from('chat_sessions')
-              .insert([{ session_id: sessionId, messages: allMessages }]);
-          }
-        }
-      }
-    });
+  const tableNames = ["chat_sessions"];
 
-    return result.toDataStreamResponse();
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "Unknown error";
-    console.error("Groq API error:", message);
-    return Response.json(
-      { error: "AI service temporarily unavailable. Please try again later." },
-      { status: 503 }
+  for (const tableName of tableNames) {
+    const { data, error } = await supabase
+      .from(tableName)
+      .select("*")
+      .eq("session_id", sessionId)
+      .maybeSingle();
+
+    if (!error && data) {
+      return data as { id: string; session_id: string; messages: StoredChatMessage[] };
+    }
+  }
+
+  return null;
+}
+
+async function upsertChatRecord(sessionId: string, messages: StoredChatMessage[]) {
+  const supabase = createServerSupabaseClient();
+  if (!supabase) {
+    return;
+  }
+
+  const record = await getChatRecord(sessionId);
+
+  if (record) {
+    await supabase
+      .from("chat_sessions")
+      .update({ messages, updated_at: new Date().toISOString() })
+      .eq("session_id", sessionId);
+    return;
+  }
+
+  await supabase.from("chat_sessions").insert({
+    session_id: sessionId,
+    messages,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  });
+}
+
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const sessionId = searchParams.get("sessionId");
+
+  if (!sessionId) {
+    return NextResponse.json({ messages: [] });
+  }
+
+  const record = await getChatRecord(sessionId);
+  return NextResponse.json({ messages: record?.messages || [] });
+}
+
+export async function POST(request: Request) {
+  try {
+    const body = (await request.json()) as {
+      sessionId?: string;
+      messages?: StoredChatMessage[];
+    };
+
+    if (!body.sessionId || !body.messages?.length) {
+      return NextResponse.json(
+        { error: "sessionId and messages are required." },
+        { status: 400 }
+      );
+    }
+
+    const assistantMessage: StoredChatMessage = {
+      id: `assistant-${Date.now()}`,
+      role: "assistant",
+      content: await generateAssistantReply(body.messages),
+      timestamp: new Date().toISOString(),
+      sessionId: body.sessionId,
+    };
+
+    const allMessages = [...body.messages, assistantMessage];
+    await upsertChatRecord(body.sessionId, allMessages);
+
+    return NextResponse.json({ message: assistantMessage, messages: allMessages });
+  } catch (error) {
+    console.error("Chat API error", error);
+    return NextResponse.json(
+      { error: "AI service temporarily unavailable." },
+      { status: 500 }
     );
   }
 }

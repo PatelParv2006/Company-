@@ -18,6 +18,8 @@ export default function AdminProjects() {
     description: "",
     case_study_content: "",
     category: "Web Apps",
+    slug: "",
+    tech_stack: "",
     is_featured: true,
     image_url: "",
     live_url: "",
@@ -64,10 +66,12 @@ export default function AdminProjects() {
       setFormData({
         title: project.title || "",
         description: project.description || "",
+        slug: project.slug || "",
+        tech_stack: Array.isArray(project.tech_stack) ? project.tech_stack.join(", ") : (project.techStack?.join(", ") || ""),
         case_study_content: project.case_study_content || project.fullDescription || "",
         category: project.category || "Web Apps",
         is_featured: project.is_featured ?? true,
-        image_url: project.image_url || project.image || "",
+        image_url: project.thumbnail_url || project.image_url || project.image || "",
         live_url: project.live_url || project.link || "",
       });
     } else {
@@ -75,6 +79,8 @@ export default function AdminProjects() {
       setFormData({
         title: "",
         description: "",
+        slug: "",
+        tech_stack: "",
         case_study_content: "",
         category: "Web Apps",
         is_featured: true,
@@ -94,25 +100,31 @@ export default function AdminProjects() {
 
     const loadToast = toast.loading("Saving project...");
     try {
+      const payload = {
+        title: formData.title,
+        description: formData.description,
+        case_study_content: formData.case_study_content,
+        category: formData.category,
+        is_featured: formData.is_featured,
+        thumbnail_url: formData.image_url,
+        live_url: formData.live_url,
+        slug: formData.slug || formData.title.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, ''),
+        tech_stack: formData.tech_stack.split(',').map(s => s.trim()).filter(Boolean),
+      };
+
       if (editingProject?.id) {
-        if (editingProject.id.toString().length === 36) {
-          // Update
-          const { error } = await supabase
-            .from('projects')
-            .update(formData)
-            .eq('id', editingProject.id);
-          if (error) throw error;
-          toast.success("Project updated", { id: loadToast });
-        } else {
-          toast.error("Cannot edit mock data. Please add a new project.", { id: loadToast });
-          setIsModalOpen(false);
-          return;
-        }
+        // Update
+        const { error } = await supabase
+          .from('projects')
+          .update(payload)
+          .eq('id', editingProject.id);
+        if (error) throw error;
+        toast.success("Project updated", { id: loadToast });
       } else {
         // Insert
         const { error } = await supabase
           .from('projects')
-          .insert([formData]);
+          .insert([payload]);
         if (error) throw error;
         toast.success("Project created", { id: loadToast });
       }
@@ -124,8 +136,8 @@ export default function AdminProjects() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!isSupabaseConfigured() || id.toString().length !== 36) {
-      toast.error("Cannot delete mock data.");
+    if (!isSupabaseConfigured()) {
+      toast.error("Supabase not configured.");
       return;
     }
 
@@ -200,8 +212,8 @@ export default function AdminProjects() {
                   <tr key={project.id} className="hover:bg-gray-50 dark:hover:bg-[#0f131d]/50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        {project.image_url || project.image ? (
-                          <img src={project.image_url || project.image} alt={project.title} className="w-10 h-10 rounded-lg object-cover bg-gray-200 dark:bg-gray-800" />
+                        {project.thumbnail_url || project.image_url || project.image ? (
+                          <img src={project.thumbnail_url || project.image_url || project.image} alt={project.title} className="w-10 h-10 rounded-lg object-cover bg-gray-200 dark:bg-gray-800" />
                         ) : (
                           <div className="w-10 h-10 rounded-lg bg-gray-200 dark:bg-gray-800 flex items-center justify-center text-gray-500 text-xs">No Img</div>
                         )}
@@ -259,13 +271,23 @@ export default function AdminProjects() {
             </div>
             <div className="p-6 overflow-y-auto flex-1">
               <div className="space-y-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Project Title</label>
-                  <input type="text" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="w-full bg-gray-50 dark:bg-[#0f131d] border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="e.g. Acme SaaS Platform" />
+                <div className="grid grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Project Title</label>
+                    <input type="text" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="w-full bg-gray-50 dark:bg-[#0f131d] border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="e.g. Acme SaaS Platform" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">URL Slug</label>
+                    <input type="text" value={formData.slug} onChange={e => setFormData({...formData, slug: e.target.value})} className="w-full bg-gray-50 dark:bg-[#0f131d] border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="e.g. acme-saas" />
+                  </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Short Description</label>
                   <input type="text" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} className="w-full bg-gray-50 dark:bg-[#0f131d] border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="e.g. A comprehensive billing dashboard" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tech Stack (comma separated)</label>
+                  <input type="text" value={formData.tech_stack} onChange={e => setFormData({...formData, tech_stack: e.target.value})} className="w-full bg-gray-50 dark:bg-[#0f131d] border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Next.js, Tailwind CSS, Supabase, Stripe" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Thumbnail Image URL</label>

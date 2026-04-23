@@ -1,40 +1,58 @@
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { getSiteSettings, getSiteUrl } from "@/lib/site-content";
 
-export const metadata = {
-  title: "Terms of Service",
-};
+export async function generateMetadata() {
+  return {
+    title: "Terms of Service",
+    description:
+      "Read the terms that govern the use of DevMind Studio's website, services, and proposals.",
+    openGraph: {
+      title: "DevMind Studio Terms of Service",
+      description:
+        "Terms governing your use of DevMind Studio's website and services.",
+      url: `${getSiteUrl()}/terms`,
+    },
+  };
+}
 
-export default function TermsPage() {
+export default async function TermsPage() {
+  const settings = await getSiteSettings();
+
   return (
-    <div className="min-h-screen bg-white dark:bg-[#030712] pt-24 pb-32">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 dark:hover:text-white mb-12 transition-colors">
-          <ArrowLeft className="w-4 h-4" /> Back to Home
-        </Link>
-        
-        <h1 className="text-4xl md:text-5xl font-heading font-bold text-gray-900 dark:text-white mb-6">
-          Terms of Service
-        </h1>
-        <p className="text-gray-500 dark:text-gray-400 mb-12">Last updated: April 2026</p>
-
-        <div className="prose prose-lg dark:prose-invert max-w-none text-gray-600 dark:text-gray-300">
+    <div className="min-h-screen bg-[#0a0a0f] pt-28 text-white">
+      <div className="mx-auto max-w-4xl px-4 pb-24 sm:px-6 lg:px-8">
+        <h1 className="font-heading text-5xl font-bold">Terms of Service</h1>
+        <p className="mt-4 text-sm text-slate-400">Last updated: April 23, 2026</p>
+        <div className="prose prose-invert mt-10 max-w-none prose-headings:font-heading prose-p:text-slate-300 prose-li:text-slate-300">
           <p>
-            Welcome to DevMind Studio!
+            These Terms of Service govern your access to and use of DevMind Studio&apos;s website, proposals, software delivery services, and related communications.
           </p>
+          <h2>Use of the Website</h2>
           <p>
-            These terms and conditions outline the rules and regulations for the use of DevMind Studio's Website, located at devmindstudio.vercel.app.
+            You agree to use this website lawfully and not to interfere with the website&apos;s functionality, security, or availability.
           </p>
+          <h2>Proposals and Services</h2>
           <p>
-            By accessing this website we assume you accept these terms and conditions. Do not continue to use DevMind Studio if you do not agree to take all of the terms and conditions stated on this page.
+            Any project proposal, timeline, or estimate is non-binding until both parties execute a written agreement. Final pricing, scope, milestones, and deliverables are defined in that agreement.
           </p>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mt-10 mb-4">License</h2>
+          <h2>Intellectual Property</h2>
           <p>
-            Unless otherwise stated, DevMind Studio and/or its licensors own the intellectual property rights for all material on DevMind Studio. All intellectual property rights are reserved. You may access this from DevMind Studio for your own personal use subjected to restrictions set in these terms and conditions.
+            Unless otherwise agreed in writing, DevMind Studio retains ownership of its pre-existing materials, processes, tooling, and frameworks. Client ownership and licensing terms for deliverables will be defined in the governing agreement.
           </p>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mt-10 mb-4">Disclaimer</h2>
+          <h2>Payments</h2>
           <p>
-            To the maximum extent permitted by applicable law, we exclude all representations, warranties and conditions relating to our website and the use of this website.
+            Fees, billing schedules, and reimbursement obligations are set out in the applicable proposal or contract. Late payments may pause delivery until accounts are brought current.
+          </p>
+          <h2>Disclaimers</h2>
+          <p>
+            The website and informational materials are provided on an &quot;as is&quot; and &quot;as available&quot; basis without warranties of any kind, to the fullest extent permitted by law.
+          </p>
+          <h2>Limitation of Liability</h2>
+          <p>
+            To the maximum extent permitted by law, DevMind Studio will not be liable for indirect, incidental, special, or consequential damages arising from the use of the website or services.
+          </p>
+          <h2>Contact</h2>
+          <p>
+            Questions about these terms may be sent to {settings.email} or mailed to {settings.address}.
           </p>
         </div>
       </div>

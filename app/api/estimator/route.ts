@@ -1,42 +1,65 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { createServerSupabaseClient } from "@/lib/supabase";
 
-export async function POST(req: Request) {
+type EstimatorPayload = {
+  name?: string;
+  email?: string;
+  projectType?: string;
+  features?: string[];
+  designQuality?: string;
+  timeline?: string;
+  support?: string;
+  estimatedMin?: number;
+  estimatedMax?: number;
+  currency?: string;
+};
+
+async function saveEstimate(payload: EstimatorPayload) {
+  const supabase = createServerSupabaseClient();
+  if (!supabase) {
+    return;
+  }
+
+  const insertPayload = {
+    name: payload.name || null,
+    email: payload.email || null,
+    project_type: payload.projectType || null,
+    features: payload.features || [],
+    design_quality: payload.designQuality || null,
+    timeline: payload.timeline || null,
+    support: payload.support || null,
+    estimated_min: payload.estimatedMin || 0,
+    estimated_max: payload.estimatedMax || 0,
+    currency: payload.currency || "INR",
+    created_at: new Date().toISOString(),
+  };
+
+  const primary = await supabase.from("estimator_submissions").insert(insertPayload);
+
+  if (primary.error) {
+    await supabase.from("estimator_subs").insert(insertPayload);
+  }
+}
+
+export async function POST(request: Request) {
   try {
-    const data = await req.json();
-    
-    const { name, email, phone, config, estimated_price, currency } = data;
-    
-    if (!config) {
-      return NextResponse.json({ error: "Configuration data is required" }, { status: 400 });
+    const payload = (await request.json()) as EstimatorPayload;
+
+    if (!payload.projectType || !payload.estimatedMin || !payload.estimatedMax) {
+      return NextResponse.json(
+        { error: "Project details and estimate range are required." },
+        { status: 400 }
+      );
     }
 
-    // Try to save to Supabase if configured
-    if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_URL !== "your_supabase_url") {
-      const { error } = await supabase
-        .from('estimator_submissions')
-        .insert([
-          { 
-            name: name || null, 
-            email: email || null, 
-            phone: phone || null, 
-            config, 
-            estimated_price, 
-            currency 
-          }
-        ]);
+    await saveEstimate(payload);
 
-      if (error) {
-        console.error("Supabase insert error:", error);
-        // We still return success to the user so they aren't blocked by DB errors
-      }
-    } else {
-      console.log("Supabase not configured. Submission received:", data);
-    }
-
-    return NextResponse.json({ success: true }, { status: 200 });
+    return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Estimator API error:", error);
-    return NextResponse.json({ error: "Failed to submit estimate" }, { status: 500 });
+    console.error("Estimator submission error", error);
+    return NextResponse.json(
+      { error: "Failed to submit estimate." },
+      { status: 500 }
+    );
   }
 }

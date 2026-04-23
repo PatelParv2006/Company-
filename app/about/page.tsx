@@ -1,121 +1,156 @@
+import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, ChevronRight, BarChart3, Code2, Globe, Layout, Lightbulb, Smartphone, ShieldCheck, Zap } from "lucide-react";
+import { ArrowRight, Lightbulb, Rocket, ShieldCheck, Sparkles } from "lucide-react";
+import AnimatedCounter from "@/components/AnimatedCounter";
+import { getSiteSettings, getSiteUrl, getTeamMembers } from "@/lib/site-content";
 
-export const metadata = {
-  title: "About Us",
-  description: "Learn about DevMind Studio's mission, our team of expert engineers, and the history behind our premium software development agency.",
-};
+export async function generateMetadata() {
+  return {
+    title: "About",
+    description:
+      "Learn about DevMind Studio's mission, story, values, and the team building premium software for ambitious companies.",
+    openGraph: {
+      title: "About DevMind Studio",
+      description:
+        "Mission, story, values, and team behind DevMind Studio.",
+      url: `${getSiteUrl()}/about`,
+    },
+  };
+}
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const [settings, team] = await Promise.all([getSiteSettings(), getTeamMembers()]);
+
   return (
-    <div className="min-h-screen bg-white dark:bg-[#030712] pt-24 pb-32">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Header */}
-        <div className="max-w-3xl mb-20">
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-heading font-bold tracking-tight text-gray-900 dark:text-white mb-6">
-            Building the <span className="text-blue-600 dark:text-blue-500">Future</span>
+    <div className="min-h-screen bg-[#0a0a0f] pt-28 text-white">
+      <div className="mx-auto max-w-7xl px-4 pb-24 sm:px-6 lg:px-8">
+        <div className="max-w-4xl">
+          <p className="text-sm font-semibold uppercase tracking-[0.28em] text-blue-300">About Us</p>
+          <h1 className="mt-4 font-heading text-5xl font-bold md:text-6xl">
+            We started DevMind Studio to make digital product delivery feel clear again.
           </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-400">
-            We are a team of passionate engineers, designers, and strategists dedicated to crafting digital masterpieces that drive business growth.
+          <p className="mt-6 text-lg leading-8 text-slate-300">
+            Since 2021, we&apos;ve helped teams turn rough concepts into polished software with stronger design decisions, healthier engineering foundations, and more reliable launch plans.
           </p>
         </div>
 
-        {/* Story Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mb-32">
-          <div>
-            <h2 className="text-3xl font-heading font-bold text-gray-900 dark:text-white mb-6">Our Story</h2>
-            <div className="space-y-6 text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
+        <div className="mt-16 grid gap-8 lg:grid-cols-[1fr_1fr]">
+          <div className="rounded-[1.8rem] border border-white/10 bg-white/5 p-8 backdrop-blur-xl">
+            <h2 className="font-heading text-3xl font-bold text-white">Our Story</h2>
+            <div className="mt-5 space-y-5 text-sm leading-7 text-slate-300">
               <p>
-                DevMind Studio was founded with a singular vision: to bridge the gap between complex business challenges and elegant, high-performance software solutions.
+                DevMind Studio was founded in Ahmedabad to close the gap between ambitious product goals and the reality of fragmented delivery.
               </p>
               <p>
-                What started as a small collective of elite developers has grown into a full-scale digital product agency. We've spent the last 5 years honing our craft, mastering modern tech stacks like Next.js, React, and cloud architecture to deliver scalable applications that perform flawlessly under pressure.
+                Too many teams were choosing between speed and quality. We built our studio around both: thoughtful product design, modern engineering, and delivery habits clients can actually trust.
               </p>
               <p>
-                We don't just write code; we build businesses. From early-stage startups needing a rapid MVP to enterprise organizations requiring secure, HIPAA-compliant systems, we adapt our expertise to your specific needs.
+                Today we partner with startups, operators, and growing companies who need web apps, SaaS products, internal systems, and AI-enabled workflows that are ready for real business use.
               </p>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-4 mt-8">
-              <div className="aspect-[4/5] rounded-3xl bg-blue-100 dark:bg-blue-900/20 overflow-hidden relative shadow-lg">
-                <div className="absolute inset-0 bg-gradient-to-t from-blue-600/50 to-transparent"></div>
-              </div>
-              <div className="aspect-square rounded-3xl bg-violet-100 dark:bg-violet-900/20 overflow-hidden relative shadow-lg">
-                <div className="absolute inset-0 bg-gradient-to-t from-violet-600/50 to-transparent"></div>
-              </div>
-            </div>
-            <div className="space-y-4">
-              <div className="aspect-square rounded-3xl bg-teal-100 dark:bg-teal-900/20 overflow-hidden relative shadow-lg">
-                <div className="absolute inset-0 bg-gradient-to-t from-teal-600/50 to-transparent"></div>
-              </div>
-              <div className="aspect-[4/5] rounded-3xl bg-amber-100 dark:bg-amber-900/20 overflow-hidden relative shadow-lg">
-                <div className="absolute inset-0 bg-gradient-to-t from-amber-600/50 to-transparent"></div>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        {/* Values */}
-        <div className="mb-32">
-          <h2 className="text-3xl font-heading font-bold text-center text-gray-900 dark:text-white mb-16">Our Core Values</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid gap-4 sm:grid-cols-2">
             {[
-              { title: "Excellence", desc: "We never compromise on quality. Every line of code, every pixel is crafted with precision." },
-              { title: "Transparency", desc: "No black boxes. We communicate openly about progress, challenges, and timelines." },
-              { title: "Innovation", desc: "We constantly research and adopt emerging technologies to give you a competitive edge." }
-            ].map((val, i) => (
-              <div key={i} className="glass-card-light dark:glass-card p-10 rounded-3xl text-center">
-                <div className="w-16 h-16 rounded-full bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center mx-auto mb-6">
-                  <CheckCircle2 className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+              { label: "Clients", value: 50, suffix: "+" },
+              { label: "Projects", value: 100, suffix: "+" },
+              { label: "Years", value: 5, suffix: "" },
+              { label: "Satisfaction", value: 99, suffix: "%" },
+            ].map((stat) => (
+              <div
+                key={stat.label}
+                className="rounded-[1.8rem] border border-white/10 bg-white/5 p-6 backdrop-blur-xl"
+              >
+                <div className="font-heading text-4xl font-bold text-white">
+                  <AnimatedCounter target={stat.value} suffix={stat.suffix} />
                 </div>
-                <h3 className="text-xl font-heading font-bold text-gray-900 dark:text-white mb-4">{val.title}</h3>
-                <p className="text-gray-600 dark:text-gray-400">{val.desc}</p>
+                <p className="mt-2 text-sm text-slate-300">{stat.label}</p>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Team Preview */}
-        <div className="text-center mb-32">
-          <h2 className="text-3xl font-heading font-bold text-gray-900 dark:text-white mb-6">Meet the Minds</h2>
-          <p className="text-xl text-gray-600 dark:text-gray-400 mb-12 max-w-2xl mx-auto">
-            Our diverse team of experts brings decades of combined experience in software engineering, design, and product strategy.
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <section className="mt-20">
+          <p className="text-sm font-semibold uppercase tracking-[0.28em] text-blue-300">Values</p>
+          <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
             {[
-              { name: "Alex Mercer", role: "Technical Director", color: "bg-blue-100 dark:bg-blue-900/30" },
-              { name: "Sarah Chen", role: "Lead UI/UX", color: "bg-purple-100 dark:bg-purple-900/30" },
-              { name: "David Kim", role: "Senior Full-Stack", color: "bg-emerald-100 dark:bg-emerald-900/30" },
-              { name: "Elena Rostova", role: "Project Manager", color: "bg-amber-100 dark:bg-amber-900/30" }
-            ].map((member, i) => (
-              <div key={i} className="group">
-                <div className={`aspect-square rounded-3xl ${member.color} mb-6 overflow-hidden relative shadow-lg`}>
-                  {/* Placeholder for actual images */}
-                  <div className="absolute inset-0 flex items-center justify-center text-4xl font-heading font-bold text-black/10 dark:text-white/10">
-                    {member.name.charAt(0)}
-                  </div>
+              { icon: Lightbulb, title: "Innovation", copy: "We look for smarter ways to solve problems without overcomplicating the product." },
+              { icon: ShieldCheck, title: "Quality", copy: "We care about reliability, clarity, and the details users feel immediately." },
+              { icon: Sparkles, title: "Transparency", copy: "We surface tradeoffs early so projects stay aligned and trust stays high." },
+              { icon: Rocket, title: "Speed", copy: "We move fast by making good decisions early, not by cutting the wrong corners." },
+            ].map((value) => (
+              <div
+                key={value.title}
+                className="rounded-[1.8rem] border border-white/10 bg-white/5 p-6 backdrop-blur-xl"
+              >
+                <div className="inline-flex rounded-2xl bg-gradient-to-br from-blue-500/20 to-violet-500/20 p-3 text-blue-200">
+                  <value.icon className="h-6 w-6" />
                 </div>
-                <h3 className="text-xl font-heading font-bold text-gray-900 dark:text-white mb-1">{member.name}</h3>
-                <p className="text-gray-500 dark:text-gray-400">{member.role}</p>
+                <h3 className="mt-5 font-heading text-2xl font-bold text-white">{value.title}</h3>
+                <p className="mt-3 text-sm leading-7 text-slate-300">{value.copy}</p>
               </div>
             ))}
           </div>
-        </div>
+        </section>
 
-        {/* CTA */}
-        <div className="bg-gradient-to-r from-blue-600 to-violet-600 rounded-3xl p-12 text-center text-white shadow-2xl relative overflow-hidden">
-          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
-          <h2 className="text-3xl md:text-4xl font-heading font-bold mb-6 relative z-10">Ready to join forces?</h2>
-          <p className="text-xl text-blue-100 mb-10 max-w-2xl mx-auto relative z-10">
-            Let's discuss how our team can help bring your vision to life.
+        <section className="mt-20">
+          <p className="text-sm font-semibold uppercase tracking-[0.28em] text-blue-300">Team</p>
+          <h2 className="mt-4 font-heading text-4xl font-bold text-white md:text-5xl">
+            The people behind the delivery.
+          </h2>
+          <div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+            {team.map((member) => (
+              <div
+                key={member.id}
+                className="overflow-hidden rounded-[1.8rem] border border-white/10 bg-white/5"
+              >
+                <div className="relative aspect-square">
+                  <Image
+                    src={member.photoUrl}
+                    alt={member.name}
+                    fill
+                    sizes="(min-width: 1280px) 25vw, (min-width: 768px) 50vw, 100vw"
+                    className="object-cover"
+                  />
+                </div>
+                <div className="p-5">
+                  <h3 className="font-heading text-xl font-bold text-white">{member.name}</h3>
+                  <p className="mt-2 text-sm text-slate-300">{member.role}</p>
+                  <a
+                    href={member.linkedinUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-4 inline-flex text-sm font-semibold text-blue-300 transition hover:text-white"
+                  >
+                    LinkedIn
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="mt-20 rounded-[2rem] border border-white/10 bg-gradient-to-r from-blue-500/15 to-violet-500/15 p-8 text-center">
+          <h2 className="font-heading text-4xl font-bold text-white">Join our next chapter.</h2>
+          <p className="mx-auto mt-4 max-w-2xl text-lg leading-8 text-slate-300">
+            We&apos;re building with clients across web, SaaS, AI, and mobile. If that sounds like your kind of work, we&apos;d love to meet you.
           </p>
-          <Link href="/contact" className="inline-flex items-center gap-2 bg-white text-blue-600 hover:bg-gray-50 px-8 py-4 rounded-full font-bold text-lg transition-colors relative z-10 shadow-xl">
-            Contact Us <ArrowRight className="w-5 h-5" />
-          </Link>
-        </div>
-
+          <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
+            <Link
+              href="/careers"
+              className="btn-glow inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-blue-500 to-violet-500 px-6 py-4 font-semibold text-white"
+            >
+              Join Our Team
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+            <a
+              href={`mailto:${settings.email}`}
+              className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-6 py-4 font-semibold text-slate-100"
+            >
+              {settings.email}
+            </a>
+          </div>
+        </section>
       </div>
     </div>
   );

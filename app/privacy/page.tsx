@@ -1,44 +1,58 @@
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { getSiteSettings, getSiteUrl } from "@/lib/site-content";
 
-export const metadata = {
-  title: "Privacy Policy",
-};
+export async function generateMetadata() {
+  return {
+    title: "Privacy Policy",
+    description:
+      "Read how DevMind Studio collects, uses, stores, and protects personal information.",
+    openGraph: {
+      title: "DevMind Studio Privacy Policy",
+      description:
+        "How DevMind Studio handles personal information and website data.",
+      url: `${getSiteUrl()}/privacy`,
+    },
+  };
+}
 
-export default function PrivacyPage() {
+export default async function PrivacyPage() {
+  const settings = await getSiteSettings();
+
   return (
-    <div className="min-h-screen bg-white dark:bg-[#030712] pt-24 pb-32">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 dark:hover:text-white mb-12 transition-colors">
-          <ArrowLeft className="w-4 h-4" /> Back to Home
-        </Link>
-        
-        <h1 className="text-4xl md:text-5xl font-heading font-bold text-gray-900 dark:text-white mb-6">
-          Privacy Policy
-        </h1>
-        <p className="text-gray-500 dark:text-gray-400 mb-12">Last updated: April 2026</p>
-
-        <div className="prose prose-lg dark:prose-invert max-w-none text-gray-600 dark:text-gray-300">
+    <div className="min-h-screen bg-[#0a0a0f] pt-28 text-white">
+      <div className="mx-auto max-w-4xl px-4 pb-24 sm:px-6 lg:px-8">
+        <h1 className="font-heading text-5xl font-bold">Privacy Policy</h1>
+        <p className="mt-4 text-sm text-slate-400">Last updated: April 23, 2026</p>
+        <div className="prose prose-invert mt-10 max-w-none prose-headings:font-heading prose-p:text-slate-300 prose-li:text-slate-300">
           <p>
-            At DevMind Studio, accessible from devmindstudio.vercel.app, one of our main priorities is the privacy of our visitors. This Privacy Policy document contains types of information that is collected and recorded by DevMind Studio and how we use it.
+            DevMind Studio respects your privacy and is committed to protecting the personal information you share with us.
           </p>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mt-10 mb-4">Information we collect</h2>
+          <h2>Information We Collect</h2>
           <p>
-            The personal information that you are asked to provide, and the reasons why you are asked to provide it, will be made clear to you at the point we ask you to provide your personal information.
+            We may collect your name, email address, phone number, company information, project details, and any other information you provide when you contact us, use our estimator, or interact with our AI assistant.
           </p>
-          <p>
-            If you contact us directly, we may receive additional information about you such as your name, email address, phone number, the contents of the message and/or attachments you may send us, and any other information you may choose to provide.
-          </p>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mt-10 mb-4">How we use your information</h2>
-          <ul className="list-disc pl-6 space-y-2 mb-8">
-            <li>Provide, operate, and maintain our website</li>
-            <li>Improve, personalize, and expand our website</li>
-            <li>Understand and analyze how you use our website</li>
-            <li>Develop new products, services, features, and functionality</li>
-            <li>Communicate with you, either directly or through one of our partners, including for customer service</li>
-            <li>Send you emails</li>
-            <li>Find and prevent fraud</li>
+          <h2>How We Use Information</h2>
+          <ul>
+            <li>Respond to inquiries and provide proposals.</li>
+            <li>Deliver, improve, and support our services.</li>
+            <li>Maintain security, analytics, and administrative records.</li>
+            <li>Comply with legal obligations and resolve disputes.</li>
           </ul>
+          <h2>Data Sharing</h2>
+          <p>
+            We do not sell your personal information. We may share data with trusted service providers such as hosting, analytics, communications, and payment partners only as needed to operate our business.
+          </p>
+          <h2>Retention</h2>
+          <p>
+            We retain information only for as long as necessary to fulfill business, contractual, legal, or security purposes.
+          </p>
+          <h2>Your Choices</h2>
+          <p>
+            You may request access, correction, or deletion of your personal information by contacting us at {settings.email}.
+          </p>
+          <h2>Contact</h2>
+          <p>
+            Questions about this policy can be sent to {settings.email} or by mail to {settings.address}.
+          </p>
         </div>
       </div>
     </div>

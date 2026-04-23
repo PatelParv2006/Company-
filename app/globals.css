@@ -2,8 +2,8 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --font-sans: var(--font-manrope);
-  --font-heading: var(--font-space-grotesk);
+  --font-sans: "Manrope", "Segoe UI", sans-serif;
+  --font-heading: "Space Grotesk", "Avenir Next", "Segoe UI", sans-serif;
   
   /* Premium Dark SaaS Palette */
   --color-white: #ffffff;
@@ -21,6 +21,14 @@
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: #0a0a0f;
+  }
+
   *,
   ::before,
   ::after {
@@ -56,15 +64,15 @@ h1, h2, h3, h4, h5, h6, p, span, label {
 }
 
 .glass-nav {
-  background: rgba(3, 7, 18, 0.8);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-.glass-nav-light {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+.dark .glass-nav {
+  background: rgba(10, 10, 15, 0.65);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 /* ═══════════════════════════════════════════

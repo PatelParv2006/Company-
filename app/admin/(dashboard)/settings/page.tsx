@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Save, Loader2, Globe, Mail, Phone, MapPin, Share2, Shield, Info } from "lucide-react";
+import { Save, Loader2, Globe, Mail, Phone, MapPin, Share2, Shield, Info, MessageSquare, Tag } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import toast from "react-hot-toast";
 
@@ -10,20 +10,21 @@ export default function AdminSettings() {
   const [isSaving, setIsSaving] = useState(false);
   
   const [settings, setSettings] = useState({
-    contact_email: "contact@devmindstudio.com",
-    contact_phone: "+91 98765 43210",
-    office_address: "Tech Hub, 4th Floor, Silicon Valley, India",
+    owner_name: "DevMind Studio",
+    company_tagline: "Premium software for teams that need more than a template.",
+    email: "hello@devmindstudio.com",
+    phone: "+91 79 4892 1188",
+    address: "Prahladnagar Corporate Road, Ahmedabad, Gujarat 380015, India",
+    city: "Ahmedabad",
     social_links: {
+      github: "https://github.com/devmindstudio",
       linkedin: "https://linkedin.com/company/devmindstudio",
       twitter: "https://twitter.com/devmindstudio",
-      github: "https://github.com/devmindstudio",
       instagram: "https://instagram.com/devmindstudio"
     },
-    site_metadata: {
-      title: "DevMind Studio | Premium Software Agency",
-      description: "We build world-class digital products with engineering excellence."
-    },
-    maintenance_mode: false
+    chatbot_system_prompt: "You are DevMind Studio's AI assistant. You help potential clients understand our services, estimate project costs, and get in touch with our team. Always be professional, friendly, and helpful.",
+    default_currency: "INR",
+    google_analytics_id: ""
   });
 
   useEffect(() => {
@@ -39,17 +40,17 @@ export default function AdminSettings() {
 
     try {
       const { data, error } = await supabase
-        .from('site_settings')
+        .from('settings')
         .select('*');
       
       if (error) throw error;
       
       if (data && data.length > 0) {
-        const settingsObj: any = {};
+        const settingsObj: any = { ...settings };
         data.forEach(item => {
           settingsObj[item.key] = item.value;
         });
-        setSettings(prev => ({ ...prev, ...settingsObj }));
+        setSettings(settingsObj);
       }
     } catch (error) {
       console.error('Error fetching settings:', error);
@@ -67,11 +68,10 @@ export default function AdminSettings() {
     setIsSaving(true);
     try {
       const promises = Object.entries(settings).map(([key, value]) => {
-        return supabase.from('site_settings').upsert({
+        return supabase.from('settings').upsert({
           key,
-          value,
-          updated_at: new Date().toISOString()
-        });
+          value
+        }, { onConflict: 'key' });
       });
 
       const results = await Promise.all(promises);
@@ -100,7 +100,7 @@ export default function AdminSettings() {
       <div className="flex justify-between items-center mb-10">
         <div>
           <h1 className="text-3xl font-heading font-bold text-gray-900 dark:text-white mb-1">Settings</h1>
-          <p className="text-gray-500 dark:text-gray-400">Configure global site parameters and contact information.</p>
+          <p className="text-gray-500 dark:text-gray-400">Configure global site parameters, AI prompt, and contact information.</p>
         </div>
         <button 
           onClick={handleSave}
@@ -113,10 +113,54 @@ export default function AdminSettings() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Contact Information */}
+        {/* General Info */}
         <div className="bg-white dark:bg-[#111827] rounded-3xl border border-gray-200 dark:border-gray-800 p-8 shadow-sm">
           <div className="flex items-center gap-3 mb-6">
             <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg text-blue-600 dark:text-blue-400">
+              <Tag className="w-5 h-5" />
+            </div>
+            <h2 className="text-xl font-heading font-bold text-gray-900 dark:text-white">General Info</h2>
+          </div>
+          
+          <div className="space-y-6">
+            <div>
+              <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Company Name</label>
+              <input 
+                type="text" 
+                value={settings.owner_name} 
+                onChange={e => setSettings({...settings, owner_name: e.target.value})}
+                className="w-full bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-gray-800 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none" 
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Company Tagline</label>
+              <textarea 
+                rows={2} 
+                value={settings.company_tagline} 
+                onChange={e => setSettings({...settings, company_tagline: e.target.value})}
+                className="w-full bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-gray-800 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none" 
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Currency Display</label>
+              <select 
+                value={settings.default_currency}
+                onChange={e => setSettings({...settings, default_currency: e.target.value})}
+                className="w-full bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-gray-800 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+              >
+                <option value="INR">INR (₹)</option>
+                <option value="USD">USD ($)</option>
+                <option value="EUR">EUR (€)</option>
+                <option value="GBP">GBP (£)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* Contact Information */}
+        <div className="bg-white dark:bg-[#111827] rounded-3xl border border-gray-200 dark:border-gray-800 p-8 shadow-sm">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg text-emerald-600 dark:text-emerald-400">
               <Mail className="w-5 h-5" />
             </div>
             <h2 className="text-xl font-heading font-bold text-gray-900 dark:text-white">Contact Info</h2>
@@ -124,11 +168,11 @@ export default function AdminSettings() {
           
           <div className="space-y-6">
             <div>
-              <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Public Contact Email</label>
+              <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Email Address</label>
               <input 
                 type="email" 
-                value={settings.contact_email} 
-                onChange={e => setSettings({...settings, contact_email: e.target.value})}
+                value={settings.email} 
+                onChange={e => setSettings({...settings, email: e.target.value})}
                 className="w-full bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-gray-800 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none" 
               />
             </div>
@@ -136,8 +180,8 @@ export default function AdminSettings() {
               <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Phone Number</label>
               <input 
                 type="text" 
-                value={settings.contact_phone} 
-                onChange={e => setSettings({...settings, contact_phone: e.target.value})}
+                value={settings.phone} 
+                onChange={e => setSettings({...settings, phone: e.target.value})}
                 className="w-full bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-gray-800 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none" 
               />
             </div>
@@ -145,11 +189,35 @@ export default function AdminSettings() {
               <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Office Address</label>
               <textarea 
                 rows={2} 
-                value={settings.office_address} 
-                onChange={e => setSettings({...settings, office_address: e.target.value})}
+                value={settings.address} 
+                onChange={e => setSettings({...settings, address: e.target.value})}
                 className="w-full bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-gray-800 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none" 
               />
             </div>
+          </div>
+        </div>
+
+        {/* AI Configuration */}
+        <div className="bg-white dark:bg-[#111827] rounded-3xl border border-gray-200 dark:border-gray-800 p-8 shadow-sm md:col-span-2">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg text-blue-600 dark:text-blue-400">
+              <MessageSquare className="w-5 h-5" />
+            </div>
+            <h2 className="text-xl font-heading font-bold text-gray-900 dark:text-white">Chatbot Intelligence</h2>
+          </div>
+          
+          <div>
+            <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">System Prompt</label>
+            <textarea 
+              rows={5} 
+              value={settings.chatbot_system_prompt} 
+              onChange={e => setSettings({...settings, chatbot_system_prompt: e.target.value})}
+              placeholder="Inject context here..."
+              className="w-full bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-gray-800 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none font-mono" 
+            />
+            <p className="mt-3 text-xs text-gray-500 leading-relaxed">
+              This prompt defines how the AI behaves. You can include details about pricing, process, and core values here.
+            </p>
           </div>
         </div>
 
@@ -159,7 +227,7 @@ export default function AdminSettings() {
             <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg text-purple-600 dark:text-purple-400">
               <Share2 className="w-5 h-5" />
             </div>
-            <h2 className="text-xl font-heading font-bold text-gray-900 dark:text-white">Social Presence</h2>
+            <h2 className="text-xl font-heading font-bold text-gray-900 dark:text-white">Social Links</h2>
           </div>
           
           <div className="space-y-4">
@@ -180,75 +248,34 @@ export default function AdminSettings() {
           </div>
         </div>
 
-        {/* SEO & Metadata */}
+        {/* Analytics & SEO */}
         <div className="bg-white dark:bg-[#111827] rounded-3xl border border-gray-200 dark:border-gray-800 p-8 shadow-sm">
           <div className="flex items-center gap-3 mb-6">
-            <div className="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-lg text-emerald-600 dark:text-emerald-400">
+            <div className="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-lg text-amber-600 dark:text-amber-400">
               <Globe className="w-5 h-5" />
             </div>
-            <h2 className="text-xl font-heading font-bold text-gray-900 dark:text-white">SEO & Metadata</h2>
+            <h2 className="text-xl font-heading font-bold text-gray-900 dark:text-white">Analytics</h2>
           </div>
           
           <div className="space-y-6">
             <div>
-              <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Default Page Title</label>
+              <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Google Analytics ID</label>
               <input 
                 type="text" 
-                value={settings.site_metadata.title} 
-                onChange={e => setSettings({
-                  ...settings, 
-                  site_metadata: { ...settings.site_metadata, title: e.target.value }
-                })}
+                value={settings.google_analytics_id} 
+                onChange={e => setSettings({...settings, google_analytics_id: e.target.value})}
+                placeholder="G-XXXXXXXXXX"
                 className="w-full bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-gray-800 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none" 
               />
             </div>
-            <div>
-              <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Meta Description</label>
-              <textarea 
-                rows={3} 
-                value={settings.site_metadata.description} 
-                onChange={e => setSettings({
-                  ...settings, 
-                  site_metadata: { ...settings.site_metadata, description: e.target.value }
-                })}
-                className="w-full bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-gray-800 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none" 
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Security & Maintenance */}
-        <div className="bg-white dark:bg-[#111827] rounded-3xl border border-gray-200 dark:border-gray-800 p-8 shadow-sm">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg text-red-600 dark:text-red-400">
-              <Shield className="w-5 h-5" />
-            </div>
-            <h2 className="text-xl font-heading font-bold text-gray-900 dark:text-white">Site Operations</h2>
-          </div>
-          
-          <div className="p-6 bg-amber-50 dark:bg-amber-900/10 rounded-2xl border border-amber-100 dark:border-amber-800/50 mb-6">
-            <div className="flex items-start gap-3">
-              <Info className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-              <div>
-                <h4 className="text-sm font-bold text-amber-900 dark:text-amber-400 mb-1">Maintenance Mode</h4>
-                <p className="text-xs text-amber-700 dark:text-amber-500/80 leading-relaxed">When enabled, visitors will see a maintenance screen. Admin Panel remains accessible.</p>
+            <div className="pt-4">
+              <div className="flex items-start gap-3 p-4 bg-blue-50 dark:bg-blue-900/10 rounded-2xl border border-blue-100 dark:border-blue-800/50">
+                <Info className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
+                <p className="text-xs text-blue-700 dark:text-blue-400 leading-relaxed">
+                  Analytics IDs are used to track visitor behavior and generate dashboard reports.
+                </p>
               </div>
             </div>
-            <div className="mt-4 flex items-center justify-between">
-              <span className="text-xs font-bold text-amber-900 dark:text-amber-400">Enable Maintenance</span>
-              <button 
-                onClick={() => setSettings({...settings, maintenance_mode: !settings.maintenance_mode})}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${settings.maintenance_mode ? 'bg-amber-600' : 'bg-gray-300 dark:bg-gray-700'}`}
-              >
-                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${settings.maintenance_mode ? 'translate-x-6' : 'translate-x-1'}`} />
-              </button>
-            </div>
-          </div>
-
-          <div className="pt-4">
-            <button className="w-full py-3 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl text-xs font-bold uppercase tracking-widest transition-colors">
-              Clear Site Cache
-            </button>
           </div>
         </div>
       </div>

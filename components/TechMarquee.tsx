@@ -19,6 +19,8 @@ const techStack = [
   { name: "AWS", color: "#FF9900", icon: "AW" },
   { name: "Firebase", color: "#FFCA28", icon: "Fb" },
   { name: "GraphQL", color: "#E10098", icon: "GQ" },
+  { name: "Tailwind CSS", color: "#38BDF8", icon: "Tw" },
+  { name: "Git", color: "#F05032", icon: "Gt" },
 ];
 
 interface TechMarqueeProps {

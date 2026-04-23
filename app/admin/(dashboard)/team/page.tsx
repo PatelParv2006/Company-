@@ -21,28 +21,7 @@ import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import toast from "react-hot-toast";
 
 // Fallback Mock Data
-const mockTeam = [
-  {
-    id: "1",
-    name: "Alex Rivera",
-    role: "Lead Architect",
-    bio: "Ex-Google engineer with 12+ years of experience in distributed systems.",
-    image_url: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop",
-    linkedin_url: "#",
-    github_url: "#",
-    is_active: true
-  },
-  {
-    id: "2",
-    name: "Elena Rodriguez",
-    role: "Senior UI Designer",
-    bio: "Award-winning designer focused on human-centric digital experiences.",
-    image_url: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop",
-    linkedin_url: "#",
-    github_url: "#",
-    is_active: true
-  }
-];
+const mockTeam: any[] = [];
 
 export default function AdminTeam() {
   const [isModalOpen, setIsModalOpen] = useState(false);

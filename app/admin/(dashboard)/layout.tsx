@@ -1,15 +1,14 @@
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { Toaster } from "react-hot-toast";
 import AdminSidebar from "@/components/admin/AdminSidebar";
+import { getAdminSession } from "@/lib/admin-auth";
 
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const cookieStore = await cookies();
-  const session = cookieStore.get("admin_session");
+  const session = await getAdminSession();
 
   if (!session) {
     redirect("/admin/login");

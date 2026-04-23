@@ -1,225 +1,412 @@
+import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, ChevronRight, BarChart3, Code2, Globe, Layout, Lightbulb, Smartphone, ShieldCheck, Zap } from "lucide-react";
-import TechMarquee from "@/components/TechMarquee";
-import ParticleGrid from "@/components/ParticleGrid";
+import { ArrowRight, BrainCircuit, CheckCircle2, Clock3, Code2, LineChart, MessageSquareText, ShieldCheck, Sparkles, Zap } from "lucide-react";
 import AnimatedCounter from "@/components/AnimatedCounter";
-import { supabase } from "@/lib/supabase";
+import ParticleGrid from "@/components/ParticleGrid";
+import TechMarquee from "@/components/TechMarquee";
+import { getBlogPosts, getFeaturedProjects, getSiteSettings, getSiteUrl } from "@/lib/site-content";
+
+export async function generateMetadata() {
+  return {
+    title: "DevMind Studio | Premium Web, SaaS & AI Product Development",
+    description:
+      "DevMind Studio builds production-ready web apps, SaaS platforms, AI solutions, and polished digital products for ambitious teams.",
+    openGraph: {
+      title: "DevMind Studio | Premium Web, SaaS & AI Product Development",
+      description:
+        "Production-ready software design and engineering for web, mobile, SaaS, and AI-powered products.",
+      url: getSiteUrl(),
+    },
+  };
+}
 
 export default async function Home() {
-  const { data } = await supabase
-    .from('projects')
-    .select('*')
-    .eq('is_featured', true)
-    .limit(3);
-  const featuredProjects = data || [];
+  const [settings, featuredProjects, posts] = await Promise.all([
+    getSiteSettings(),
+    getFeaturedProjects(),
+    getBlogPosts(),
+  ]);
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    name: "DevMind Studio",
+    description:
+      "Custom software development agency specializing in premium web apps, SaaS platforms, mobile apps, and AI solutions.",
+    url: getSiteUrl(),
+    email: settings.email,
+    telephone: settings.phone,
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: settings.address,
+      addressLocality: settings.city,
+      addressCountry: "IN",
+    },
+  };
+
+  const latestPosts = posts.slice(0, 3);
 
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* Hero Section */}
-      <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden flex items-center justify-center min-h-[90vh]">
+    <div className="overflow-hidden bg-[#0a0a0f] text-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
+      <section className="relative flex min-h-[92vh] items-center overflow-hidden pt-28">
         <ParticleGrid />
-        
-        {/* Glow Effects */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-500/20 rounded-full blur-[120px] pointer-events-none mix-blend-screen dark:mix-blend-color-dodge" />
-        <div className="absolute top-1/4 right-1/4 w-[400px] h-[400px] bg-violet-500/20 rounded-full blur-[100px] pointer-events-none mix-blend-screen dark:mix-blend-color-dodge" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.18),transparent_30%),radial-gradient(circle_at_80%_20%,rgba(139,92,246,0.16),transparent_28%),linear-gradient(180deg,#0a0a0f_0%,#070912_100%)]" />
+        <div className="absolute left-1/2 top-24 h-80 w-80 -translate-x-1/2 rounded-full bg-blue-500/20 blur-[120px]" />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 font-medium text-sm mb-8 border border-blue-200 dark:border-blue-500/20 animate-float">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
-            </span>
-            Premium Software Development Agency
-          </div>
-          
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-heading font-bold tracking-tight text-gray-900 dark:text-white mb-6 leading-tight">
-            We Build Digital <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-violet-600 dark:from-blue-400 dark:to-violet-400">
-              Masterpieces
-            </span>
-          </h1>
-          
-          <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-10 max-w-3xl mx-auto font-light">
-            DevMind Studio engineers high-performance web applications, SaaS platforms, and mobile experiences for visionary brands.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/estimator" className="w-full sm:w-auto btn-glow bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all flex items-center justify-center gap-2">
-              Estimate Project <ArrowRight className="w-5 h-5" />
-            </Link>
-            <Link href="/projects" className="w-full sm:w-auto px-8 py-4 rounded-xl font-bold text-lg text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 transition-colors flex items-center justify-center border border-gray-200 dark:border-white/10">
-              View Portfolio
-            </Link>
-          </div>
+        <div className="relative mx-auto grid max-w-7xl gap-14 px-4 pb-20 sm:px-6 lg:grid-cols-[1.15fr_0.85fr] lg:px-8">
+          <div className="max-w-3xl">
+            <div className="inline-flex items-center gap-2 rounded-full border border-blue-400/20 bg-blue-500/10 px-4 py-2 text-sm font-semibold text-blue-200">
+              <Sparkles className="h-4 w-4" />
+              Product strategy, engineering, and delivery under one roof
+            </div>
+            <h1 className="mt-8 font-heading text-5xl font-bold leading-[1.02] text-white md:text-7xl">
+              Premium software for teams that need more than a template.
+            </h1>
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-300 md:text-xl">
+              We build polished web apps, SaaS platforms, AI-powered workflows, and mobile products that are ready for real users, real scale, and real operations.
+            </p>
 
-          <div className="mt-20 pt-10 border-t border-gray-200/50 dark:border-white/10 grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
-            {[
-              { label: "Clients", value: 50, suffix: "+" },
-              { label: "Projects", value: 120, suffix: "+" },
-              { label: "Years Exp", value: 5, suffix: "+" },
-              { label: "Satisfaction", value: 99, suffix: "%" }
-            ].map((stat) => (
-              <div key={stat.label} className="text-center">
-                <div className="text-3xl md:text-4xl font-heading font-bold text-gray-900 dark:text-white mb-1">
-                  <AnimatedCounter target={stat.value} suffix={stat.suffix} />
-                </div>
-                <div className="text-sm text-gray-500 dark:text-gray-400 font-medium">{stat.label}</div>
+            <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+              <Link
+                href="/estimator"
+                className="btn-glow inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-blue-500 to-violet-500 px-7 py-4 text-base font-semibold text-white"
+              >
+                Estimate Your Project
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+              <Link
+                href="/projects"
+                className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-7 py-4 text-base font-semibold text-slate-100 backdrop-blur transition hover:bg-white/10"
+              >
+                See Our Work
+              </Link>
+            </div>
+
+            <div className="mt-8 inline-flex items-start gap-3 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 backdrop-blur-xl">
+              <LineChart className="mt-1 h-5 w-5 text-blue-300" />
+              <div>
+                <p className="font-semibold text-white">Data-Driven UX</p>
+                <p className="mt-1 text-sm leading-6 text-slate-300">
+                  We combine analytics, product sense, and careful interface design to improve adoption, conversions, and operational clarity.
+                </p>
               </div>
-            ))}
+            </div>
+
+            <div className="mt-12 grid max-w-2xl grid-cols-2 gap-6 border-t border-white/10 pt-8 md:grid-cols-4">
+              {[
+                { label: "Clients", value: 50, suffix: "+" },
+                { label: "Projects", value: 100, suffix: "+" },
+                { label: "Years", value: 5, suffix: "" },
+                { label: "Satisfaction", value: 99, suffix: "%" },
+              ].map((stat) => (
+                <div key={stat.label}>
+                  <div className="text-3xl font-heading font-bold text-white">
+                    <AnimatedCounter target={stat.value} suffix={stat.suffix} />
+                  </div>
+                  <p className="mt-1 text-sm text-slate-400">{stat.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="relative">
+            <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-2xl shadow-blue-500/10 backdrop-blur-2xl">
+              <div className="rounded-[1.75rem] border border-white/10 bg-[#0b1020] p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm uppercase tracking-[0.25em] text-blue-300">Delivery Snapshot</p>
+                    <h2 className="mt-2 text-2xl font-heading font-bold text-white">
+                      Strategy-led execution
+                    </h2>
+                  </div>
+                  <div className="rounded-2xl bg-blue-500/15 p-3 text-blue-300">
+                    <BrainCircuit className="h-6 w-6" />
+                  </div>
+                </div>
+                <div className="mt-8 space-y-4">
+                  {[
+                    { icon: Code2, title: "Modern stack", copy: "Next.js, TypeScript, Supabase, and dependable cloud tooling." },
+                    { icon: ShieldCheck, title: "Production standards", copy: "Security, observability, QA, and launch-readiness built in." },
+                    { icon: Clock3, title: "Clear delivery rhythm", copy: "Focused milestones, transparent updates, and fast feedback loops." },
+                  ].map((item) => (
+                    <div
+                      key={item.title}
+                      className="rounded-2xl border border-white/10 bg-white/5 p-4"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="rounded-xl bg-white/10 p-2 text-blue-200">
+                          <item.icon className="h-5 w-5" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-white">{item.title}</h3>
+                          <p className="mt-1 text-sm leading-6 text-slate-300">{item.copy}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Tech Marquee */}
-      <section className="py-10 border-y border-gray-200/50 dark:border-white/5 bg-gray-50/50 dark:bg-white/[0.01]">
+      <section className="border-y border-white/10 bg-[#070914] py-8">
         <TechMarquee />
       </section>
 
-      {/* Services Section */}
-      <section className="py-24 md:py-32 bg-white dark:bg-[#030712] relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-blue-600 dark:text-blue-400 font-semibold tracking-wide uppercase mb-3">Our Expertise</h2>
-            <h3 className="text-4xl md:text-5xl font-heading font-bold text-gray-900 dark:text-white">Services we deliver</h3>
+      <section className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-3xl text-center">
+          <p className="text-sm font-semibold uppercase tracking-[0.28em] text-blue-300">Why Choose Us</p>
+          <h2 className="mt-4 font-heading text-4xl font-bold text-white md:text-5xl">
+            Built for serious product teams
+          </h2>
+          <p className="mt-4 text-lg leading-8 text-slate-300">
+            We help founders and operators move from vague requirements to production-ready software with less chaos and more clarity.
+          </p>
+        </div>
+
+        <div className="mt-14 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+          {[
+            {
+              icon: Zap,
+              title: "Fast without cutting corners",
+              copy: "We move quickly by narrowing scope intelligently, not by ignoring quality.",
+            },
+            {
+              icon: MessageSquareText,
+              title: "Communication you can trust",
+              copy: "Expect clear decisions, honest tradeoffs, and no disappearing acts mid-project.",
+            },
+            {
+              icon: CheckCircle2,
+              title: "Polish that supports outcomes",
+              copy: "We care about UI because it directly shapes conversions, adoption, and trust.",
+            },
+            {
+              icon: LineChart,
+              title: "Business-aware engineering",
+              copy: "Architecture, analytics, and operations are designed around how your product grows.",
+            },
+          ].map((item) => (
+            <div
+              key={item.title}
+              className="rounded-[1.75rem] border border-white/10 bg-white/5 p-6 backdrop-blur-xl"
+            >
+              <div className="inline-flex rounded-2xl bg-gradient-to-br from-blue-500/20 to-violet-500/20 p-3 text-blue-200">
+                <item.icon className="h-6 w-6" />
+              </div>
+              <h3 className="mt-5 text-xl font-heading font-bold text-white">{item.title}</h3>
+              <p className="mt-3 text-sm leading-7 text-slate-300">{item.copy}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="border-y border-white/10 bg-[#070914] py-8">
+        <TechMarquee reverse />
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
+        <div className="mb-12 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+          <div className="max-w-2xl">
+            <p className="text-sm font-semibold uppercase tracking-[0.28em] text-blue-300">Our Featured Projects</p>
+            <h2 className="mt-4 font-heading text-4xl font-bold text-white md:text-5xl">
+              Six case studies, one shared delivery standard
+            </h2>
+          </div>
+          <Link href="/projects" className="inline-flex items-center text-sm font-semibold text-blue-300">
+            Browse all projects
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Link>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+          {featuredProjects.slice(0, 6).map((project) => (
+            <Link
+              key={project.slug}
+              href={`/projects/${project.slug}`}
+              className="group overflow-hidden rounded-[1.9rem] border border-white/10 bg-white/5 backdrop-blur-xl transition hover:-translate-y-1"
+            >
+              <div className="relative aspect-[16/10] overflow-hidden">
+                {project.liveUrl ? (
+                  <div className="absolute inset-0 z-0">
+                    <iframe 
+                      src={project.liveUrl} 
+                      className="w-[125%] h-[125%] origin-top-left scale-[0.8] border-none pointer-events-none grayscale-[0.5] group-hover:grayscale-0 transition-all duration-700"
+                      title={project.title}
+                      loading="lazy"
+                    />
+                  </div>
+                ) : (
+                  <Image
+                    src={project.thumbnailUrl}
+                    alt={project.title}
+                    fill
+                    sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw"
+                    className="object-cover transition duration-500 group-hover:scale-105"
+                  />
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#05060c] via-[#05060c]/40 to-transparent z-10" />
+                <span className="absolute left-5 top-5 rounded-full border border-white/15 bg-black/20 px-3 py-1 text-xs font-semibold text-blue-100 backdrop-blur">
+                  {project.category}
+                </span>
+              </div>
+              <div className="p-6">
+                <h3 className="text-2xl font-heading font-bold text-white">{project.title}</h3>
+                <p className="mt-3 text-sm leading-7 text-slate-300">{project.description}</p>
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {project.techStack.slice(0, 4).map((item) => (
+                    <span
+                      key={item}
+                      className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-slate-200"
+                    >
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
+        <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.28em] text-blue-300">FAQ</p>
+            <h2 className="mt-4 font-heading text-4xl font-bold text-white md:text-5xl">
+              Questions we hear all the time
+            </h2>
+            <p className="mt-4 max-w-xl text-lg leading-8 text-slate-300">
+              If you&apos;re still comparing options or refining scope, these answers should help you move forward with more confidence.
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="space-y-4">
             {[
               {
-                icon: <Globe className="w-8 h-8" />,
-                title: "Web Applications",
-                desc: "High-performance, scalable web apps built with Next.js and React."
+                question: "How much does a SaaS project cost?",
+                answer:
+                  "It depends on the scope, but most SaaS builds vary based on roles, billing, analytics, integrations, and the quality bar. Our estimator gives a fast starting range.",
               },
               {
-                icon: <Smartphone className="w-8 h-8" />,
-                title: "Mobile Development",
-                desc: "Native-feeling iOS and Android apps using React Native and Flutter."
+                question: "How long does a typical project take?",
+                answer:
+                  "Simple websites can launch in a few weeks. Most custom web apps and SaaS products land in the 6 to 16 week range depending on complexity and feedback cycles.",
               },
               {
-                icon: <Layout className="w-8 h-8" />,
-                title: "SaaS Platforms",
-                desc: "End-to-end SaaS architecture with multi-tenancy and subscription billing."
+                question: "Do you handle design as well as engineering?",
+                answer:
+                  "Yes. We handle product strategy, UX, interface design, frontend, backend, QA, and launch support so the experience stays cohesive end to end.",
               },
               {
-                icon: <ShieldCheck className="w-8 h-8" />,
-                title: "Enterprise Software",
-                desc: "Secure, compliant, and robust systems for large organizations."
+                question: "Can you improve an existing product instead of rebuilding it?",
+                answer:
+                  "Absolutely. We often step into existing codebases to stabilize delivery, improve UX, or modernize architecture without a full rewrite.",
               },
               {
-                icon: <Code2 className="w-8 h-8" />,
-                title: "API Development",
-                desc: "RESTful and GraphQL APIs built for speed and reliability."
+                question: "Do you build mobile apps too?",
+                answer:
+                  "Yes. We build mobile experiences when they are the right product surface, especially for operational tools, customer apps, and companion products.",
               },
               {
-                icon: <Lightbulb className="w-8 h-8" />,
-                title: "UI/UX Design",
-                desc: "Stunning, user-centric interfaces that convert and engage."
-              }
-            ].map((service, i) => (
-              <div key={i} className="glass-card-light dark:glass-card p-8 rounded-3xl hover:-translate-y-2 transition-transform duration-300 group">
-                <div className="w-16 h-16 rounded-2xl bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                  {service.icon}
-                </div>
-                <h4 className="text-xl font-heading font-bold text-gray-900 dark:text-white mb-3">{service.title}</h4>
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed">{service.desc}</p>
-              </div>
+                question: "What happens after launch?",
+                answer:
+                  "We can support ongoing iteration, performance tuning, analytics review, and roadmap delivery through structured support plans.",
+              },
+            ].map((item) => (
+              <details
+                key={item.question}
+                className="group rounded-[1.5rem] border border-white/10 bg-white/5 p-6 backdrop-blur-xl"
+              >
+                <summary className="cursor-pointer list-none font-heading text-xl font-bold text-white">
+                  {item.question}
+                </summary>
+                <p className="mt-4 text-sm leading-7 text-slate-300">{item.answer}</p>
+              </details>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Featured Projects */}
-      <section className="py-24 md:py-32 bg-gray-50 dark:bg-[#0a0f1e]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
-            <div>
-              <h2 className="text-blue-600 dark:text-blue-400 font-semibold tracking-wide uppercase mb-3">Selected Work</h2>
-              <h3 className="text-4xl md:text-5xl font-heading font-bold text-gray-900 dark:text-white">Featured Projects</h3>
+      <section className="border-t border-white/10 bg-[#070914] py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-12 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+            <div className="max-w-2xl">
+              <p className="text-sm font-semibold uppercase tracking-[0.28em] text-blue-300">Recent Blog Posts</p>
+              <h2 className="mt-4 font-heading text-4xl font-bold text-white md:text-5xl">
+                Ideas from the studio
+              </h2>
             </div>
-            <Link href="/projects" className="inline-flex items-center gap-2 text-blue-600 dark:text-blue-400 font-semibold hover:gap-3 transition-all">
-              View All Work <ArrowRight className="w-5 h-5" />
+            <Link href="/blog" className="inline-flex items-center text-sm font-semibold text-blue-300">
+              View all posts
+              <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredProjects.map((project) => (
-              <Link key={project.id} href={`/projects/${project.id}`} className="group block">
-                <div className={`aspect-video rounded-3xl mb-6 bg-gradient-to-br from-blue-500 to-indigo-600 p-8 flex flex-col justify-between overflow-hidden relative shadow-lg`}>
-                  {project.image_url && (
-                    <img src={project.image_url} alt={project.title} className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-500" />
-                  )}
-                  <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-500" />
-                  <span className="relative z-10 px-4 py-1.5 rounded-full bg-white/20 backdrop-blur-md text-sm font-medium text-white w-fit border border-white/30">
-                    {project.category}
-                  </span>
-                  <div className="relative z-10 translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                    <div className="flex items-center gap-2 text-white font-medium">
-                      View Case Study <ChevronRight className="w-4 h-4" />
-                    </div>
-                  </div>
+          <div className="grid gap-6 md:grid-cols-3">
+            {latestPosts.map((post) => (
+              <Link
+                key={post.slug}
+                href={`/blog/${post.slug}`}
+                className="group overflow-hidden rounded-[1.8rem] border border-white/10 bg-white/5 transition hover:-translate-y-1"
+              >
+                <div className="relative aspect-[16/10] overflow-hidden">
+                  <Image
+                    src={post.thumbnailUrl}
+                    alt={post.title}
+                    fill
+                    sizes="(min-width: 768px) 33vw, 100vw"
+                    className="object-cover transition duration-500 group-hover:scale-105"
+                  />
                 </div>
-                <h4 className="text-2xl font-heading font-bold text-gray-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                  {project.title}
-                </h4>
-                <p className="text-gray-600 dark:text-gray-400">{project.description}</p>
+                <div className="p-6">
+                  <div className="flex flex-wrap gap-2">
+                    {post.tags.slice(0, 2).map((tag) => (
+                      <span
+                        key={tag}
+                        className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-slate-200"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                  <h3 className="mt-4 text-2xl font-heading font-bold text-white">{post.title}</h3>
+                  <p className="mt-3 text-sm leading-7 text-slate-300">{post.excerpt}</p>
+                </div>
               </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Process Section */}
-      <section className="py-24 md:py-32 bg-white dark:bg-[#030712] relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center mb-20">
-            <h2 className="text-blue-600 dark:text-blue-400 font-semibold tracking-wide uppercase mb-3">How we work</h2>
-            <h3 className="text-4xl md:text-5xl font-heading font-bold text-gray-900 dark:text-white">Our proven process</h3>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
-            {/* Connecting line for desktop */}
-            <div className="hidden md:block absolute top-12 left-0 w-full h-[2px] bg-gradient-to-r from-blue-100 via-blue-500 to-blue-100 dark:from-blue-900/30 dark:via-blue-500/50 dark:to-blue-900/30" />
-
-            {[
-              { step: "01", title: "Discovery", desc: "We deep-dive into your requirements, market, and goals to craft a strategic roadmap." },
-              { step: "02", title: "Design", desc: "Our UX/UI team creates stunning, intuitive interfaces that your users will love." },
-              { step: "03", title: "Development", desc: "We build scalable, high-performance architecture using modern tech stacks." },
-              { step: "04", title: "Delivery", desc: "Rigorous testing followed by seamless deployment and ongoing support." }
-            ].map((item, i) => (
-              <div key={i} className="relative pt-8">
-                <div className="w-24 h-24 rounded-full bg-white dark:bg-[#0a0f1e] border-4 border-blue-50 dark:border-[#030712] shadow-xl flex items-center justify-center text-2xl font-heading font-bold text-blue-600 dark:text-blue-400 absolute -top-4 left-1/2 md:left-0 -translate-x-1/2 md:translate-x-0 z-10">
-                  {item.step}
-                </div>
-                <div className="text-center md:text-left mt-16 md:mt-20">
-                  <h4 className="text-xl font-heading font-bold text-gray-900 dark:text-white mb-3">{item.title}</h4>
-                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed">{item.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-24 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-violet-700"></div>
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
-        
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-          <h2 className="text-4xl md:text-6xl font-heading font-bold text-white mb-6">
-            Ready to build the next big thing?
-          </h2>
-          <p className="text-xl text-blue-100 mb-10 leading-relaxed">
-            Let's turn your vision into reality. Get a detailed estimate for your project in minutes, or contact us directly to discuss your requirements.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link href="/contact" className="btn-glow bg-white text-blue-600 hover:bg-gray-50 px-8 py-4 rounded-xl font-bold text-lg transition-all shadow-xl">
-              Contact Us Now
-            </Link>
-            <Link href="/estimator" className="px-8 py-4 rounded-xl font-bold text-lg text-white border border-white/30 hover:bg-white/10 transition-colors backdrop-blur-sm">
-              Try Project Estimator
-            </Link>
-          </div>
+      <section className="mx-auto max-w-5xl px-4 py-24 text-center sm:px-6 lg:px-8">
+        <p className="text-sm font-semibold uppercase tracking-[0.28em] text-blue-300">Start the Conversation</p>
+        <h2 className="mt-4 font-heading text-4xl font-bold text-white md:text-6xl">
+          Let&apos;s scope the right build, not just the fastest one.
+        </h2>
+        <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-slate-300">
+          Use the estimator for a fast range, talk to the AI assistant for quick answers, or reach out directly if you already know what you want to build.
+        </p>
+        <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
+          <Link
+            href="/contact"
+            className="btn-glow inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-blue-500 to-violet-500 px-7 py-4 font-semibold text-white"
+          >
+            Contact Us
+          </Link>
+          <Link
+            href="/ai-assistant"
+            className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-7 py-4 font-semibold text-slate-100 transition hover:bg-white/10"
+          >
+            Ask the AI Assistant
+          </Link>
         </div>
       </section>
     </div>

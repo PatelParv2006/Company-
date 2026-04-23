@@ -2,25 +2,26 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, FolderKanban, Users, MessageSquare, Briefcase, FileText, Settings, LogOut, Code2, PenTool } from "lucide-react";
+import { LayoutDashboard, FolderKanban, Users, MessageSquare, Briefcase, FileText, Settings, LogOut, PenTool, Layers3, BadgeHelp } from "lucide-react";
 
 const navItems = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { name: "Projects", href: "/admin/projects", icon: FolderKanban },
+  { name: "Testimonials", href: "/admin/testimonials", icon: BadgeHelp },
   { name: "Inquiries", href: "/admin/inquiries", icon: MessageSquare },
   { name: "Estimates", href: "/admin/estimator-submissions", icon: Briefcase },
   { name: "AI Chats", href: "/admin/chat-logs", icon: MessageSquare },
   { name: "Blog", href: "/admin/blog", icon: PenTool },
   { name: "Team", href: "/admin/team", icon: Users },
-  { name: "Testimonials", href: "/admin/testimonials", icon: FileText },
+  { name: "Careers", href: "/admin/careers", icon: FileText },
   { name: "Settings", href: "/admin/settings", icon: Settings },
 ];
 
 export default function AdminSidebar() {
   const pathname = usePathname();
 
-  const handleSignOut = () => {
-    document.cookie = "admin_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  const handleSignOut = async () => {
+    await fetch("/api/admin/auth", { method: "DELETE" });
     window.location.href = "/admin/login";
   };
 
@@ -37,7 +38,9 @@ export default function AdminSidebar() {
 
       <div className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
         {navItems.map((item) => {
-          const isActive = pathname === item.href;
+          const isActive =
+            pathname === item.href ||
+            (item.href !== "/admin" && pathname.startsWith(item.href));
           return (
             <Link
               key={item.name}

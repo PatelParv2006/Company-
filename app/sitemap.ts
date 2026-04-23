@@ -1,15 +1,42 @@
 import type { MetadataRoute } from "next";
+import { getBlogPosts, getProjects, getSiteUrl } from "@/lib/site-content";
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl =
-    process.env.NEXT_PUBLIC_BASE_URL || "https://devmindstudio.com";
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const baseUrl = getSiteUrl();
+  const [projects, posts] = await Promise.all([getProjects(), getBlogPosts()]);
 
-  return [
-    { url: baseUrl, lastModified: new Date(), changeFrequency: "monthly", priority: 1 },
-    { url: `${baseUrl}/services`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.9 },
-    { url: `${baseUrl}/projects`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
-    { url: `${baseUrl}/estimator`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.7 },
-    { url: `${baseUrl}/ai-assistant`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
-    { url: `${baseUrl}/contact`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.8 },
-  ];
+  const staticRoutes: MetadataRoute.Sitemap = [
+    "",
+    "/about",
+    "/blog",
+    "/careers",
+    "/contact",
+    "/estimator",
+    "/projects",
+    "/services",
+    "/ai-assistant",
+    "/privacy",
+    "/terms",
+  ].map((path) => ({
+    url: `${baseUrl}${path}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly",
+    priority: path === "" ? 1 : 0.8,
+  }));
+
+  const projectRoutes = projects.map((project) => ({
+    url: `${baseUrl}/projects/${project.slug}`,
+    lastModified: new Date(project.createdAt),
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
+  }));
+
+  const blogRoutes = posts.map((post) => ({
+    url: `${baseUrl}/blog/${post.slug}`,
+    lastModified: new Date(post.createdAt),
+    changeFrequency: "monthly" as const,
+    priority: 0.6,
+  }));
+
+  return [...staticRoutes, ...projectRoutes, ...blogRoutes];
 }

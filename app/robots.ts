@@ -1,14 +1,14 @@
 import type { MetadataRoute } from "next";
+import { getSiteUrl } from "@/lib/site-content";
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl =
-    process.env.NEXT_PUBLIC_BASE_URL || "https://devmindstudio.com";
+  const baseUrl = getSiteUrl();
 
   return {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/admin/", "/api/"],
+      disallow: ["/admin"],
     },
     sitemap: `${baseUrl}/sitemap.xml`,
   };

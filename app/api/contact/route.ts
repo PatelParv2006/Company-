@@ -1,32 +1,86 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { createServerSupabaseClient } from "@/lib/supabase";
+import { getSiteSettings } from "@/lib/site-content";
 
-export async function POST(req: Request) {
+type InquiryPayload = {
+  name?: string;
+  email?: string;
+  phone?: string;
+  projectType?: string;
+  budget?: string;
+  message?: string;
+};
+
+async function saveInquiry(payload: InquiryPayload) {
+  const supabase = createServerSupabaseClient();
+  if (!supabase) {
+    return;
+  }
+
+  const insertPayload = {
+    name: payload.name,
+    email: payload.email,
+    phone: payload.phone || null,
+    project_type: payload.projectType || null,
+    budget: payload.budget || null,
+    message: payload.message,
+    read: false,
+    created_at: new Date().toISOString(),
+  };
+
+  await supabase.from("inquiries").insert(insertPayload);
+}
+
+async function sendInquiryNotification(payload: InquiryPayload) {
+  if (!process.env.RESEND_API_KEY) {
+    return;
+  }
+
+  const settings = await getSiteSettings();
+
+  await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: "DevMind Studio <onboarding@resend.dev>",
+      to: [settings.email],
+      subject: `New inquiry from ${payload.name}`,
+      html: `
+        <h2>New DevMind Studio inquiry</h2>
+        <p><strong>Name:</strong> ${payload.name}</p>
+        <p><strong>Email:</strong> ${payload.email}</p>
+        <p><strong>Phone:</strong> ${payload.phone || "Not provided"}</p>
+        <p><strong>Project Type:</strong> ${payload.projectType || "Not provided"}</p>
+        <p><strong>Budget:</strong> ${payload.budget || "Not provided"}</p>
+        <p><strong>Message:</strong></p>
+        <p>${payload.message}</p>
+      `,
+    }),
+  });
+}
+
+export async function POST(request: Request) {
   try {
-    const data = await req.json();
-    const { name, email, phone, projectType, budget, message } = data;
+    const payload = (await request.json()) as InquiryPayload;
 
-    if (!name || !email || !message) {
-      return NextResponse.json({ error: "Name, email, and message are required" }, { status: 400 });
+    if (!payload.name || !payload.email || !payload.message) {
+      return NextResponse.json(
+        { error: "Name, email, and message are required." },
+        { status: 400 }
+      );
     }
 
-    if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_URL !== "your_supabase_url") {
-      const { error } = await supabase
-        .from('inquiries')
-        .insert([
-          { name, email, phone: phone || null, project_type: projectType || null, budget: budget || null, message }
-        ]);
+    await Promise.allSettled([saveInquiry(payload), sendInquiryNotification(payload)]);
 
-      if (error) {
-        console.error("Supabase insert error:", error);
-      }
-    } else {
-      console.log("Supabase not configured. Inquiry received:", data);
-    }
-
-    return NextResponse.json({ success: true }, { status: 200 });
+    return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Contact API error:", error);
-    return NextResponse.json({ error: "Failed to submit inquiry" }, { status: 500 });
+    console.error("Contact submission error", error);
+    return NextResponse.json(
+      { error: "Failed to submit inquiry." },
+      { status: 500 }
+    );
   }
 }
